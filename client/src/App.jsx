@@ -63,10 +63,17 @@ function App() {
 
   useEffect(() => {
     const fetchFavorites = async () => {
-      const response = await fetch(`/api/users/${auth.id}/favorites`);
+      const response = await fetch(`/api/users/${auth.id}/favorites`, {
+        headers: {
+          authorization: window.localStorage.getItem("token"),
+        },
+      });
+
       const json = await response.json();
       if (response.ok) {
         setFavorites(json);
+      } else {
+        console.log(json);
       }
     };
     if (auth.id) {
@@ -100,9 +107,9 @@ function App() {
       body: JSON.stringify({ product_id }),
       headers: {
         "Content-Type": "application/json",
+        authorization: window.localStorage.getItem("token"),
       },
     });
-
     const json = await response.json();
     if (response.ok) {
       setFavorites([...favorites, json]);
@@ -114,8 +121,10 @@ function App() {
   const removeFavorite = async (id) => {
     const response = await fetch(`/api/users/${auth.id}/favorites/${id}`, {
       method: "DELETE",
+      headers: {
+        authorization: window.localStorage.getItem("token"),
+      },
     });
-
     if (response.ok) {
       setFavorites(favorites.filter((favorite) => favorite.id !== id));
     } else {
